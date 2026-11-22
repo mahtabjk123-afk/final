@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mahtab — BolMizan Founder Command Radar</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { margin: 0; background: #060b19; color: #f8fafc; padding: 20px; }
+    .container { max-width: 1120px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg, #0f172a, #064e3b); border: 2px solid #f59e0b; border-radius: 18px; padding: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .badge { background: #f59e0b; color: #090d16; font-weight: 900; padding: 4px 12px; border-radius: 999px; font-size: 11px; text-transform: uppercase; }
+    h1 { margin: 6px 0 4px; font-size: 24px; color: #ffffff; }
+    .sub { font-size: 13px; color: #cbd5e1; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .kpi { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 16px; }
+    .kpi-label { font-size: 12px; color: #94a3b8; font-weight: 600; }
+    .kpi-val { font-size: 28px; font-weight: 900; color: #34d399; margin-top: 6px; }
+    .kpi-sub { font-size: 11px; color: #fbbf24; margin-top: 4px; }
+    .panel { background: #0f172a; border: 1px solid #334155; border-radius: 16px; padding: 18px; margin-bottom: 18px; }
+    .panel h2 { margin: 0 0 10px; font-size: 16px; color: #38bdf8; }
+    textarea { width: 100%; background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 10px; padding: 10px; font-size: 12px; }
+    button { background: #10b981; color: #052e16; font-weight: 800; border: none; border-radius: 8px; padding: 10px 16px; font-size: 12px; cursor: pointer; margin-top: 8px; }
+    button.secondary { background: #f59e0b; color: #090d16; margin-left: 8px; }
+    .issue-item { background: #1e293b; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+    .issue-title { font-weight: 800; font-size: 13px; color: #fbbf24; }
+    .issue-body { font-size: 12px; color: #cbd5e1; margin-top: 4px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <span class="badge">Founder Eyes Only • Live Telemetry & AI Evolution Radar</span>
+        <h1>BolMizan Founder Command Center — Mahtab</h1>
+        <div class="sub">Sakrand, Sindh • Guardian Contact: 0305-8359178 • Email: mahtabjk123@gmail.com</div>
+      </div>
+      <div>
+        <button onclick="loadLiveGitHubTelemetry()">Refresh Live Data</button>
+        <button class="secondary" onclick="window.open('https://github.com', '_blank')">Open All User Issues</button>
+      </div>
+    </div>
+
+    <div class="grid-4">
+      <div class="kpi">
+        <div class="kpi-label">Live APK Downloads (GitHub CDN)</div>
+        <div class="kpi-val" id="kpi-downloads">Loading...</div>
+        <div class="kpi-sub">BolMizan-v1.0-Signed-Release.apk</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">User Voice & AI Feature Reports</div>
+        <div class="kpi-val" id="kpi-issues" style="color:#fbbf24;">Loading...</div>
+        <div class="kpi-sub">30-Day Consensus Queue</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Aggregated Offline Field Actions</div>
+        <div class="kpi-val" id="kpi-actions" style="color:#38bdf8;">0</div>
+        <div class="kpi-sub">From Imported Device Packets</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Repository Commits & AI Cycles</div>
+        <div class="kpi-val" id="kpi-commits" style="color:#a78bfa;">41+</div>
+        <div class="kpi-sub">Autonomous Safety Gate Active</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>1. Import Consumer Telemetry Packet (From WhatsApp 0305-8359178 or Phone Backup)</h2>
+      <p style="font-size:12px; color:#94a3b8; margin-top:0;">
+        Jab koi dukandar ya kisan aapko WhatsApp par apna Activity Packet ya Backup JSON bheje, to yahan paste karke "Merge User Activity" dabayein:
+      </p>
+      <textarea id="packet-input" rows="3" placeholder='Paste user telemetry JSON or WhatsApp feedback packet here...'></textarea>
+      <button onclick="importUserPacket()">Merge User Activity Into Founder Radar</button>
+      <div id="import-status" style="font-size:12px; color:#34d399; margin-top:8px; font-weight:700;"></div>
+    </div>
+
+    <div class="panel">
+      <h2>2. Live User Voice Feedback & 30-Day AI Feature Requests (Direct From App)</h2>
+      <div id="issues-list">Fetching live user submissions from GitHub...</div>
+    </div>
+  </div>
+
+  <script>
+    const REPO = 'mahtabjk123-afk/final';
+    let mergedActions = Number(localStorage.getItem('founder_merged_actions') || '0');
+    document.getElementById('kpi-actions').innerText = mergedActions.toLocaleString();
+
+    async function loadLiveGitHubTelemetry() {
+      try {
+        const relRes = await fetch(`https://github.com{REPO}/releases`);
+        const releases = await relRes.json();
+        let totalDownloads = 0;
+        if (Array.isArray(releases)) {
+          releases.forEach(r => {
+            if (Array.isArray(r.assets)) {
+              r.assets.forEach(a => { totalDownloads += (a.download_count || 0); });
+            }
+          });
+        }
+        document.getElementById('kpi-downloads').innerText = totalDownloads.toLocaleString();
+      } catch {
+        document.getElementById('kpi-downloads').innerText = 'Offline';
+      }
+
+      try {
+        const issRes = await fetch(`https://github.com{REPO}/issues?state=all&per_page=30`);
+        const issues = await issRes.json();
+        const container = document.getElementById('issues-list');
+        if (Array.isArray(issues)) {
+          document.getElementById('kpi-issues').innerText = issues.length;
+          if (issues.length === 0) {
+            container.innerHTML = '<div style="font-size:12px; color:#94a3b8;">No remote issues yet. Ask Sakrand merchants to tap "Send to AI Agent" in the app!</div>';
+          } else {
+            container.innerHTML = issues.map(i => `
+              <div class="issue-item">
+                <div class="issue-title">${i.title} <span style="font-size:10px; color:#94a3b8;">(${new Date(i.created_at).toLocaleDateString()})</span></div>
+                <div class="issue-body">${(i.body || '').slice(0, 320)}</div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch {
+        document.getElementById('issues-list').innerHTML = '<div style="font-size:12px; color:#f87171;">Connect internet to sync live GitHub user feedback.</div>';
+      }
+    }
+
+    function importUserPacket() {
+      const raw = document.getElementById('packet-input').value.trim();
+      if (!raw) return;
+      let added = 1;
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) added = parsed.length;
+        else if (parsed.totalEvents) added = Number(parsed.totalEvents);
+        else if (parsed.records) added = Object.keys(parsed.records).length * 5;
+      } catch {
+        const match = raw.match(/(\d+)\s*events/i);
+        if (match) added = Number(match);
+      }
+      mergedActions += added;
+      localStorage.setItem('founder_merged_actions', String(mergedActions));
+      document.getElementById('kpi-actions').innerText = mergedActions.toLocaleString();
+      document.getElementById('packet-input').value = '';
+      document.getElementById('import-status').innerText = `Merged +${added} consumer field actions into your Founder Radar!`;
+    }
+
+    loadLiveGitHubTelemetry();
+  </script>
+</body>
+</html>

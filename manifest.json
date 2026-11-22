@@ -1,0 +1,17 @@
+{
+  "name": "BolMizan Sovereign OS",
+  "short_name": "BolMizan",
+  "description": "100% Offline-First Cryptographic & Islamic Financial Operating System for Rural Mandis & Farmers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050811",
+  "theme_color": "#059669",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/bolmizan-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
